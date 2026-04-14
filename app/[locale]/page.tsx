@@ -9,7 +9,7 @@ export const revalidate = 0   // always fresh
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams: { success?: string }
+  searchParams: Promise<{ success?: string }>
 }) {
   const { success } = await searchParams
 
