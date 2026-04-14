@@ -35,5 +35,5 @@ export async function getRecentKings(): Promise<RecentKing[]> {
     .order('reigned_at', { ascending: false })
     .limit(10)
   if (error) throw new Error(`Failed to fetch recent kings: ${error.message}`)
-  return data as RecentKing[]
+  return (data ?? []) as RecentKing[]
 }
