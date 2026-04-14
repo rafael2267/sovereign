@@ -2,7 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe/client'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 
+export async function GET() {
+  return NextResponse.json({
+    hasSecret: !!process.env.STRIPE_WEBHOOK_SECRET,
+    hasStripeKey: !!process.env.STRIPE_SECRET_KEY,
+  })
+}
+
 export async function POST(req: NextRequest) {
+  console.log('STRIPE_WEBHOOK_SECRET present:', !!process.env.STRIPE_WEBHOOK_SECRET)
   const rawBody = await req.text()
   const sig = req.headers.get('stripe-signature')
 
