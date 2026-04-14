@@ -3,7 +3,7 @@
     "title": "Sovereign",
     "currentlyReigning": "currently reigning",
     "noKing": "No one reigns yet. Be the first.",
-    "claim": "Claim the Throne — ${price}",
+    "claim": "Claim the Throne — {price}",
     "priceNote": "price increases $1 with every purchase"
   },
   "modal": {

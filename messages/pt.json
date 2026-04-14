@@ -3,7 +3,7 @@
     "title": "Sovereign",
     "currentlyReigning": "reinando agora",
     "noKing": "Ninguém reina ainda. Seja o primeiro.",
-    "claim": "Reivindicar o Trono — ${price}",
+    "claim": "Reivindicar o Trono — {price}",
     "priceNote": "o preço aumenta $1 a cada compra"
   },
   "modal": {

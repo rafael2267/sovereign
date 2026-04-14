@@ -8,14 +8,14 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        gold: '#ffd700',
-        'gold-dark': '#b8860b',
+        gold: '#ffd700',        // 14.6:1 em bg-base — AAA
+        'gold-dark': '#c8960c', // 7.2:1 em bg-base  — AAA
         'bg-base': '#0a0a0a',
-        'bg-elevated': '#111111',
-        'bg-card': '#1a1a1a',
-        'border-subtle': '#1a1a1a',
-        'text-muted': '#444444',
-        'text-dim': '#333333',
+        'bg-elevated': '#161616',
+        'bg-card': '#222222',
+        'border-subtle': '#222222',
+        'text-muted': '#aaaaaa', // 8.6:1 em bg-base  — AAA
+        'text-dim': '#888888',   // 5.6:1 em bg-base  — AA
       },
       fontFamily: {
         serif: ['Georgia', 'Times New Roman', 'serif'],

@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { NETWORKS } from '@/lib/networks'
 import { NetworkIcon } from './NetworkIcon'
 import type { NetworkId } from '@/lib/networks'
@@ -10,6 +11,7 @@ type Props = {
 }
 
 export function NetworkSelector({ selected, onSelect }: Props) {
+  const t = useTranslations('modal')
   const [showMore, setShowMore] = useState(false)
 
   const mainNetworks = NETWORKS.filter((n) => n.main)
@@ -48,7 +50,7 @@ export function NetworkSelector({ selected, onSelect }: Props) {
         >
           <span className="text-text-muted text-lg leading-none">···</span>
           <span className="text-[9px] font-bold text-text-muted tracking-wide">
-            {showMore ? 'Less' : 'More'}
+            {showMore ? t('lessNetworks') : t('moreNetworks')}
           </span>
         </button>
       </div>

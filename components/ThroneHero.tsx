@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { createBrowserClient } from '@/lib/supabase/client'
 import { NetworkIcon } from './NetworkIcon'
 import { NETWORKS_MAP } from '@/lib/networks'
@@ -20,6 +21,7 @@ type Props = {
 }
 
 export function ThroneHero({ initialKing, initialPrice, onClaim }: Props) {
+  const t = useTranslations('hero')
   const [king, setKing] = useState<King | null>(initialKing)
   const [price, setPrice] = useState(initialPrice)
   const [duration, setDuration] = useState('')
@@ -74,7 +76,7 @@ export function ThroneHero({ initialKing, initialPrice, onClaim }: Props) {
 
       {king ? (
         <>
-          <p className="text-gold-dark text-[9px] uppercase tracking-[3px] mb-1">currently reigning</p>
+          <p className="text-gold-dark text-[9px] uppercase tracking-[3px] mb-1">{t('currentlyReigning')}</p>
           <h1 className="text-gold font-serif text-5xl sm:text-6xl font-black leading-tight mb-3">
             @{king.handle}
           </h1>
@@ -96,7 +98,7 @@ export function ThroneHero({ initialKing, initialPrice, onClaim }: Props) {
         </>
       ) : (
         <>
-          <p className="text-gold-dark text-sm mb-6">No one reigns yet. Be the first.</p>
+          <p className="text-gold-dark text-sm mb-6">{t('noKing')}</p>
         </>
       )}
 
@@ -105,9 +107,9 @@ export function ThroneHero({ initialKing, initialPrice, onClaim }: Props) {
         onClick={onClaim}
         className="bg-gold text-bg-base font-black text-sm uppercase tracking-[3px] px-10 py-3.5 hover:bg-yellow-300 transition-colors"
       >
-        Claim the Throne — ${(price / 100).toFixed(0)}
+        {t('claim', { price: `$${(price / 100).toFixed(0)}` })}
       </button>
-      <p className="text-bg-card text-[10px] mt-3 tracking-wide">price increases $1 with every purchase</p>
+      <p className="text-text-dim text-[10px] mt-3 tracking-wide">{t('priceNote')}</p>
     </section>
   )
 }

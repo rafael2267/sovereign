@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentKing } from '@/lib/supabase/queries'
-import { createPayPalOrder } from '@/lib/paypal/orders'
+import { createCheckoutSession } from '@/lib/stripe/checkout'
 import { VALID_NETWORK_IDS } from '@/lib/networks'
 
 const HANDLE_REGEX = /^[\w.]{1,50}$/   // word chars + dots, 1–50 chars
@@ -20,8 +20,8 @@ export async function POST(req: NextRequest) {
 
   try {
     const state = await getCurrentKing()
-    const { approvalUrl } = await createPayPalOrder(handle, network, state.current_price)
-    return NextResponse.json({ url: approvalUrl })
+    const { url } = await createCheckoutSession(handle, network, state.current_price)
+    return NextResponse.json({ url })
   } catch (err) {
     console.error('Checkout error:', err)
     return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })

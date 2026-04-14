@@ -7,10 +7,9 @@ import { NextRequest } from 'next/server'
 jest.mock('@/lib/supabase/queries', () => ({
   getCurrentKing: jest.fn().mockResolvedValue({ current_price: 4700 }),
 }))
-jest.mock('@/lib/paypal/orders', () => ({
-  createPayPalOrder: jest.fn().mockResolvedValue({
-    approvalUrl: 'https://paypal.com/approve/123',
-    orderId: 'ORDER-123',
+jest.mock('@/lib/stripe/checkout', () => ({
+  createCheckoutSession: jest.fn().mockResolvedValue({
+    url: 'https://checkout.stripe.com/pay/cs_test_123',
   }),
 }))
 
@@ -23,13 +22,13 @@ function makeRequest(body: unknown) {
 }
 
 describe('POST /api/checkout', () => {
-  it('returns PayPal approval URL for valid input', async () => {
+  it('returns Stripe checkout URL for valid input', async () => {
     const req = makeRequest({ handle: 'elonmusk', network: 'instagram' })
     const res = await POST(req)
     const body = await res.json()
 
     expect(res.status).toBe(200)
-    expect(body.url).toBe('https://paypal.com/approve/123')
+    expect(body.url).toBe('https://checkout.stripe.com/pay/cs_test_123')
   })
 
   it('rejects invalid handle (special chars)', async () => {
