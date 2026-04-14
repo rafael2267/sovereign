@@ -30,8 +30,9 @@ ALTER TABLE state ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "kings_public_read" ON kings FOR SELECT USING (true);
 CREATE POLICY "state_public_read" ON state FOR SELECT USING (true);
 
--- Enable Realtime on state table
+-- Enable Realtime on both tables
 ALTER PUBLICATION supabase_realtime ADD TABLE state;
+ALTER PUBLICATION supabase_realtime ADD TABLE kings;
 
 -- RPC: atomically crown a new king (SECURITY DEFINER bypasses RLS)
 CREATE OR REPLACE FUNCTION crown_new_king(
@@ -41,36 +42,46 @@ CREATE OR REPLACE FUNCTION crown_new_king(
   p_paypal_order_id TEXT
 ) RETURNS UUID AS $$
 DECLARE
-  v_new_king_id UUID;
+  v_new_king_id    UUID;
+  v_existing_id    UUID;
 BEGIN
-  -- Idempotency: if this order was already processed, return NULL
-  IF EXISTS (SELECT 1 FROM kings WHERE paypal_order_id = p_paypal_order_id) THEN
-    RETURN NULL;
+  -- Serialize concurrent calls to prevent race conditions
+  PERFORM pg_advisory_xact_lock(hashtext('crown_new_king'));
+
+  -- Idempotency: if this order was already processed, return existing king UUID
+  SELECT id INTO v_existing_id FROM kings WHERE paypal_order_id = p_paypal_order_id;
+  IF v_existing_id IS NOT NULL THEN
+    RETURN v_existing_id;
   END IF;
 
-  -- Dethrone current king
-  UPDATE kings
-  SET dethroned_at = NOW()
-  WHERE id = (SELECT current_king_id FROM state WHERE id = 1)
-    AND dethroned_at IS NULL;
+  BEGIN
+    -- Dethrone current king
+    UPDATE kings
+    SET dethroned_at = NOW()
+    WHERE id = (SELECT current_king_id FROM state WHERE id = 1)
+      AND dethroned_at IS NULL;
 
-  -- Insert new king
-  INSERT INTO kings (handle, network, price_paid, paypal_order_id, reigned_at)
-  VALUES (p_handle, p_network, p_price_paid, p_paypal_order_id, NOW())
-  RETURNING id INTO v_new_king_id;
+    -- Insert new king
+    INSERT INTO kings (handle, network, price_paid, paypal_order_id, reigned_at)
+    VALUES (p_handle, p_network, p_price_paid, p_paypal_order_id, NOW())
+    RETURNING id INTO v_new_king_id;
 
-  -- Update state atomically
-  UPDATE state SET
-    current_king_id = v_new_king_id,
-    current_price   = current_price + 100,    -- +$1 in cents
-    total_kings     = total_kings + 1
-  WHERE id = 1;
+    -- Update state atomically
+    UPDATE state SET
+      current_king_id = v_new_king_id,
+      current_price   = current_price + 100,    -- +$1 in cents
+      total_kings     = total_kings + 1
+    WHERE id = 1;
+
+  EXCEPTION WHEN OTHERS THEN
+    RAISE EXCEPTION 'crown_new_king failed: %', SQLERRM;
+  END;
 
   RETURN v_new_king_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
--- RPC: compute all stats in one query
+-- RPC: compute all stats in one query (SECURITY INVOKER — reads public tables only)
 CREATE OR REPLACE FUNCTION get_stats()
 RETURNS JSON AS $$
 DECLARE
@@ -112,22 +123,28 @@ BEGIN
   ORDER BY (dethroned_at - reigned_at) ASC
   LIMIT 1;
 
-  -- Most attempts (by handle, any network)
+  -- Most attempts (by handle, any network — shows most recent network used)
   SELECT json_build_object(
-    'handle', handle,
-    'network', (SELECT network FROM kings k2 WHERE k2.handle = kings.handle ORDER BY reigned_at DESC LIMIT 1),
+    'handle', k_outer.handle,
+    'network', (
+      SELECT k_inner.network
+      FROM kings k_inner
+      WHERE k_inner.handle = k_outer.handle
+      ORDER BY k_inner.reigned_at DESC
+      LIMIT 1
+    ),
     'count', COUNT(*)
   ) INTO v_attempts
-  FROM kings
-  GROUP BY handle
+  FROM kings k_outer
+  GROUP BY k_outer.handle
   ORDER BY COUNT(*) DESC
   LIMIT 1;
 
   RETURN json_build_object(
-    'longest_reign',    v_longest,
-    'biggest_spender',  v_spender,
-    'fastest_dethroned', v_fastest,
-    'most_attempts',    v_attempts
+    'longest_reign',     COALESCE(v_longest,  'null'::json),
+    'biggest_spender',   COALESCE(v_spender,  'null'::json),
+    'fastest_dethroned', COALESCE(v_fastest,  'null'::json),
+    'most_attempts',     COALESCE(v_attempts, 'null'::json)
   );
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SET search_path = public;
