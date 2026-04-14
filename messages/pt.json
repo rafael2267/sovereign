@@ -1,0 +1,32 @@
+{
+  "hero": {
+    "title": "Sovereign",
+    "currentlyReigning": "reinando agora",
+    "noKing": "Ninguém reina ainda. Seja o primeiro.",
+    "claim": "Reivindicar o Trono — ${price}",
+    "priceNote": "o preço aumenta $1 a cada compra"
+  },
+  "modal": {
+    "title": "Reivindicar o Trono",
+    "handleLabel": "Seu @ handle",
+    "handlePlaceholder": "seu handle",
+    "networkLabel": "Rede Social",
+    "pay": "Pagar {price} via PayPal",
+    "paying": "Redirecionando...",
+    "redirectNote": "Você será redirecionado ao PayPal para concluir o pagamento",
+    "moreNetworks": "Mais",
+    "lessNetworks": "Menos"
+  },
+  "stats": {
+    "longestReign": "Reinado Mais Longo",
+    "biggestSpender": "Maior Gastador",
+    "fastestDethroned": "Destronado Mais Rápido",
+    "mostAttempts": "Mais Tentativas",
+    "totalKings": "Total de Reis",
+    "uniqueRulers": "governantes únicos",
+    "noData": "Sem dados ainda"
+  },
+  "recent": {
+    "title": "Reis Recentes"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "hero": {
+    "title": "Sovereign",
+    "currentlyReigning": "currently reigning",
+    "noKing": "No one reigns yet. Be the first.",
+    "claim": "Claim the Throne — ${price}",
+    "priceNote": "price increases $1 with every purchase"
+  },
+  "modal": {
+    "title": "Claim the Throne",
+    "handleLabel": "Your @ handle",
+    "handlePlaceholder": "your handle",
+    "networkLabel": "Social Network",
+    "pay": "Pay {price} via PayPal",
+    "paying": "Redirecting...",
+    "redirectNote": "You will be redirected to PayPal to complete payment",
+    "moreNetworks": "More",
+    "lessNetworks": "Less"
+  },
+  "stats": {
+    "longestReign": "Longest Reign",
+    "biggestSpender": "Biggest Spender",
+    "fastestDethroned": "Fastest Dethroned",
+    "mostAttempts": "Most Attempts",
+    "totalKings": "Total Kings",
+    "uniqueRulers": "unique rulers",
+    "noData": "No data yet"
+  },
+  "recent": {
+    "title": "Recent Kings"
+  }
+}
