@@ -11,9 +11,9 @@
     "handleLabel": "Seu @ handle",
     "handlePlaceholder": "seu handle",
     "networkLabel": "Rede Social",
-    "pay": "Pagar {price} via PayPal",
+    "pay": "Pagar {price} com Cartão",
     "paying": "Redirecionando...",
-    "redirectNote": "Você será redirecionado ao PayPal para concluir o pagamento",
+    "redirectNote": "Você será redirecionado para uma página de pagamento segura",
     "moreNetworks": "Mais",
     "lessNetworks": "Menos"
   },
